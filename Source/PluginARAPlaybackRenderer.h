@@ -11,6 +11,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "PluginARADocumentController.h"
 
 //==============================================================================
 /**
@@ -19,7 +20,11 @@ class ARAIO_PlaybackRenderer  : public juce::ARAPlaybackRenderer
 {
 public:
     //==============================================================================
-    using juce::ARAPlaybackRenderer::ARAPlaybackRenderer;
+    ARAIO_PlaybackRenderer(ARA::PlugIn::DocumentController* documentController,
+                          ProcessingLockInterface& lockInterface)
+        : juce::ARAPlaybackRenderer(documentController)
+        , processingLock(lockInterface)
+    {}
 
     //==============================================================================
     void prepareToPlay (double sampleRate,
@@ -36,6 +41,7 @@ public:
 
 private:
     //==============================================================================
+    ProcessingLockInterface& processingLock;
     double sampleRate = 44100.0;
     int maximumSamplesPerBlock = 4096;
     int numChannels = 1;

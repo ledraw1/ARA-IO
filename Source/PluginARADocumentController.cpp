@@ -14,7 +14,7 @@
 //==============================================================================
 juce::ARAPlaybackRenderer* ARAIO_DocumentController::doCreatePlaybackRenderer() noexcept
 {
-    return new ARAIO_PlaybackRenderer (getDocumentController());
+    return new ARAIO_PlaybackRenderer (getDocumentController(), *this);
 }
 
 //==============================================================================

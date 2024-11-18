@@ -13,6 +13,10 @@
 //==============================================================================
 void ARAIO_PlaybackRenderer::prepareToPlay (double sampleRateIn, int maximumSamplesPerBlockIn, int numChannelsIn, juce::AudioProcessor::ProcessingPrecision, AlwaysNonRealtime alwaysNonRealtime)
 {
+    const auto lock = processingLock.getProcessingLock();
+    if (!lock.isLocked())
+        return;
+
     numChannels = numChannelsIn;
     sampleRate = sampleRateIn;
     maximumSamplesPerBlock = maximumSamplesPerBlockIn;
@@ -21,6 +25,9 @@ void ARAIO_PlaybackRenderer::prepareToPlay (double sampleRateIn, int maximumSamp
 
 void ARAIO_PlaybackRenderer::releaseResources()
 {
+    const auto lock = processingLock.getProcessingLock();
+    if (!lock.isLocked())
+        return;
 }
 
 //==============================================================================
@@ -28,6 +35,10 @@ bool ARAIO_PlaybackRenderer::processBlock (juce::AudioBuffer<float>& buffer,
                                                        juce::AudioProcessor::Realtime realtime,
                                                        const juce::AudioPlayHead::PositionInfo& positionInfo) noexcept
 {
+    const auto lock = processingLock.getProcessingLock();
+    if (!lock.isLocked())
+        return false;
+
     const auto numSamples = buffer.getNumSamples();
     jassert (numSamples <= maximumSamplesPerBlock);
     jassert (numChannels == buffer.getNumChannels());

@@ -18,6 +18,15 @@ ARAIO_AudioProcessor::ARAIO_AudioProcessor()
                      .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      )
 {
+    #if JUCE_UNIT_TESTS && JucePlugin_Build_Standalone
+    // Run tests in standalone mode
+    juce::UnitTestRunner testRunner;
+    testRunner.runAllTests();
+    
+    // Exit with appropriate status code
+    if (testRunner.getNumResults() > 0 && testRunner.getResult(testRunner.getNumResults() - 1)->failures > 0)
+        juce::JUCEApplication::quit();
+    #endif
 }
 
 ARAIO_AudioProcessor::~ARAIO_AudioProcessor()
