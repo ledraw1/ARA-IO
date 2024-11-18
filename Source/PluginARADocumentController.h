@@ -38,6 +38,47 @@ public:
     // Add any public methods that you need here
     const juce::Array<ARA::PlugIn::RegionSequence*>& getRegionSequences() const { return regionSequences; }
 
+    // Get metadata for all regions in a sequence
+    struct RegionMetadata {
+        juce::String name;
+        double startTime;
+        double endTime;
+        juce::String audioSource;
+    };
+
+    juce::Array<RegionMetadata> getRegionMetadata(ARA::PlugIn::RegionSequence* sequence) const
+    {
+        juce::Array<RegionMetadata> metadata;
+        if (sequence == nullptr)
+            return metadata;
+
+        for (auto playbackRegion : sequence->getPlaybackRegions())
+        {
+            if (playbackRegion == nullptr)
+                continue;
+
+            RegionMetadata region;
+            
+            // Get name with fallback
+            auto name = playbackRegion->getName();
+            region.name = name != nullptr ? juce::String(name) : juce::String("Unnamed Region");
+
+            // Get timing info with validation
+            region.startTime = juce::jmax(0.0, playbackRegion->getStartInPlaybackTime());
+            region.endTime = juce::jmax(region.startTime, playbackRegion->getEndInPlaybackTime());
+
+            // Get audio source with validation
+            auto modification = playbackRegion->getAudioModification();
+            auto audioSource = modification != nullptr ? modification->getAudioSource() : nullptr;
+            region.audioSource = (audioSource != nullptr && audioSource->getName() != nullptr) 
+                               ? juce::String(audioSource->getName()) 
+                               : juce::String("Unknown Source");
+
+            metadata.add(region);
+        }
+        return metadata;
+    }
+
 protected:
     //==============================================================================
     // Override document controller customization methods here
